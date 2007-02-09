@@ -28,70 +28,65 @@ public class Repeat extends Parser {
 	}
 	
 	public Result parseNew(String s, int pos, ResultList rl) {
-		ArrayList matches=(ArrayList)rl.getData();
+		ArrayList<Result> matches=(ArrayList<Result>)rl.getData();
+		int currentpos=pos;
 		if (matches==null) {
-			matches=new ArrayList();
+			matches=new ArrayList<Result>();
 			rl.setData(matches);
+			
+			// get as many results as possible
+			for (int i=matches.size(); i<max; i++) {
+				Result r=parser.parseList(s, currentpos).first();
+				if (r==null) break;
+				matches.add(r);
+				currentpos+=r.length;
+			}
+			
+			// return first result
+			if (matches.size()>=min) {
+				Result r=new Result(matches.clone(),s,pos,currentpos-pos);
+				return r;
+			}
 		} else if (matches.size()==0) {
 			// already returned all matches
 			return null;
 		}
-		int currentpos=pos;
 		
 		// complete array
-		for (int i=matches.size(); i<=max; i++) {
-			if (i<0) return null;
-
+		for (int i=matches.size(); i>=min; i--) {
 			boolean backup=false;
 			Result r=null;
-			// advance if not at end of matches
-			if (i<max) {
-				// get right position if not at start
-				if (i>0) {
-					Result tr=(Result)(matches.get(i-1));
-					currentpos=tr.position+tr.length;
-				}
-				
-				r=parser.parseList(s, currentpos).first();
-				if (r!=null) {
-					matches.add(r);
-					currentpos=r.position+r.length;
-					if ((i+1)>=min) {
-						break;
-					}
-				} else {
-					backup=true;
-				}
+			// we are at the end
+			r=matches.get(i-1);
+			r=r.getNext();
+			if (r!=null) {
+				matches.set(i-1, r);
+				currentpos=r.position+r.length;
 			} else {
-				// we are at the end
-				r=(Result)(matches.get(i-1));
-				r=r.getNext();
-				if (r!=null) {
-					matches.set(i-1, r);
-					currentpos=r.position+r.length;
-					break;
-				} else {
-					matches.remove(i-1);
-					i-=1;
-					backup=true;
-				}
+				matches.remove(i-1);
+				i--;
+				backup=true;
+				if (i==0) return null;
+				r=matches.get(i-1);
+				currentpos=r.position+r.length;
 			}
 				
-			if (backup) {
-				while (true) {
-					if (i<=0) return null;
-					r=(Result)(matches.get(i-1));
-					r=r.getNext();
-					i-=1;	
-					if (r!=null) break;
-				} 
-				// next candidate
-				matches.set(i, r);
+			if (!backup) {
+				while(i<max) {	
+					Result rnext=parser.parseList(s, currentpos).first();
+					if (rnext==null) break;
+					matches.add(rnext);
+					i++;
+					currentpos+=rnext.length;
+				}	
 			}
+			
+			Result radd=new Result(matches.clone(),s,pos,currentpos-pos);
+			return radd;
 		}
 		
-		Result r=new Result(matches.clone(),s,pos,currentpos-pos);
-		return r;
+		matches.clear();
+		return null;
 	}
 	
 	public void action(Result r) {
