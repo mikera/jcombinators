@@ -51,19 +51,33 @@ public class ParserTest extends TestCase {
 		assertEquals(1,maybespace.parseList("").count());
 	}
 
+	public void testRepeatSimple() {
+		Parser pa=new Sequence(new Repeat(new Match("a")),new End());
+		assertNull(pa.parse(""));
+		assertNull(pa.parse("b"));
+		assertNotNull(pa.parse("a"));
+		assertEquals(1,pa.parse("a").length);		
+		assertNotNull(pa.parse("aa"));
+		assertNotNull(pa.parse("aaaaaaaa"));
+	}
+		
+	public void testRepeatMany() {
+		Parser pa=new Repeat(new Match("a"));
+		ResultList rl=pa.parseList("aaaa",0);
+		assertEquals(4,rl.first().length);
+		assertEquals(4,rl.count());
+
+	}
+	
 	
 	public void testRepeat() {
-		Parser pa=new Sequence(new Repeat(new Match("a")),new End());
-		assertNotNull(pa.parse("a"));
-		assertNotNull(pa.parse("aaaaaaaa"));
-
-		
 		String s=new String("ababababa");
 		
 		Parser p=new Repeat(new Match("ab"));
 		
 		ResultList rl=p.parseList(s,0);
 		assertEquals(4,rl.count());
+		assertEquals(8,rl.first().length);
 		
 		Result r=rl.first();
 		assertTrue(r!=null);
