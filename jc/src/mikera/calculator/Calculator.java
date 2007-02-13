@@ -1,6 +1,9 @@
 package mikera.calculator;
 
-import mikera.parser.*;
+import mikera.parser.Parser;
+import mikera.parser.Result;
+import mikera.parser.primitives.*;
+
 import java.util.*;
 
 public class Calculator {

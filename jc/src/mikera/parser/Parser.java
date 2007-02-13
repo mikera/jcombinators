@@ -2,9 +2,11 @@ package mikera.parser;
 
 import java.util.*;
 
-public class Parser {
-	private Map memo=new HashMap();
-	
+
+public class Parser implements Action {
+	private WeakHashMap<String,WeakHashMap<Integer,ResultList>> memo=new WeakHashMap<String,WeakHashMap<Integer,ResultList>>();
+	protected Action action;
+
 	public Parser() {
 		
 	}
@@ -20,27 +22,42 @@ public class Parser {
 		return r;
 	}
 	
+	public Result parseFirst(String s) {
+		return parseList(s,0).first();
+	}
+	
+	public int parseCount(String s) {
+		return parseList(s,0).count();
+	}
+	
+	protected void clearMemo() {
+		memo.clear();
+	}
+	
+	
 	public ResultList parseList(String s) {
 		return parseList(s,0);
 	}
 	
 	public ResultList parseList(String s, int pos) {
-		ResultList[] results=(ResultList[])memo.get(s);
+		WeakHashMap<Integer,ResultList> results=memo.get(s);
+		
 		ResultList r=null;
+		Integer i=new Integer(pos);
 		
 		if (results!=null) {
-			r=results[pos];
+			r=results.get(i);
 			if (r!=null ) {
 				return r;
 			} 
 		} else {
-			results=new ResultList[s.length()+1];
-			
+			results=new WeakHashMap<Integer,ResultList>();
+			memo.put(s,results);
 		}
 		
 		r=new ResultList(this,s,pos);
 
-		results[pos]=r;
+		results.put(i, r);
 		return r;
 	}
 	
@@ -48,7 +65,13 @@ public class Parser {
 		return null;
 	}
 	
+	public void setAction(Action a) {
+		action=a;
+	}
+
 	public void action(Result r) {
-	
+		if (action!=null) {
+			action.action(r);
+		}
 	}
 }
