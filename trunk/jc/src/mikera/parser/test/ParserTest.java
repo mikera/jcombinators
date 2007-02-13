@@ -1,7 +1,10 @@
 package mikera.parser.test;
 
 import junit.framework.TestCase;
-import mikera.parser.*;
+import mikera.parser.Parser;
+import mikera.parser.Result;
+import mikera.parser.ResultList;
+import mikera.parser.primitives.*;
 
 import java.util.*;
 
@@ -42,13 +45,21 @@ public class ParserTest extends TestCase {
 		
 	}
 	
-	public void testMaybe() {
-		Parser whitespace=new Whitespace();
-		Parser maybespace=new Maybe(whitespace);
+	public void testAmbiguousSequence() {
+		Parser p=new Sequence(new Whitespace(),new Char("x"),new Whitespace(), new End());
+		assertEquals(1,p.parseCount("   x "));
+		Result fp=p.parseFirst(" x ");
+		assertEquals("x",fp.getSubResult(1).object);
 		
-		assertEquals(1,maybespace.parseList("a").count());
-		assertEquals(2,maybespace.parseList(" a").count());
-		assertEquals(1,maybespace.parseList("").count());
+		p=new Sequence(new Whitespace(),new Whitespace(),new End());
+		assertEquals(2,p.parseCount("   "));
+	}
+	
+	
+	public void testEndSequence() {
+		Parser q=new Sequence(new Whitespace(), new End());
+		assertEquals(1,q.parseCount("        "));
+		assertEquals(3,q.parseFirst("   ").length);
 	}
 
 	public void testRepeatSimple() {
@@ -67,6 +78,39 @@ public class ParserTest extends TestCase {
 		assertEquals(4,rl.first().length);
 		assertEquals(4,rl.count());
 
+	}
+	
+	public void testRepeatCombinations() {
+		Parser pa=new Repeat(new Choice(new Match("a"),new Match("aa")));
+		ResultList rl=pa.parseList("aaaa",0);
+		assertEquals(11,rl.count());
+	}
+	
+	public void testRepeatLimit() {
+		Parser pa=new Repeat(new Match("a"),3,5);
+		ResultList rl=pa.parseList("aaaaaaaaaa",0);
+		assertEquals(5,rl.first().length);
+		assertEquals(3,rl.count());
+	}
+	
+	public void testSubsequence() {
+		String s=new String("abcdefgh");
+		CharSequence cs=s.subSequence(3, 7);
+		assertEquals("defg",cs.toString());
+	}
+	
+	public void testRepeatRegex() {
+		String s=new String("ababab");
+		Parser p=new Repeat(new Regex(".b"));
+		assertEquals(3,p.parseCount(s));
+		assertEquals(6,p.parseFirst(s).length);
+	}
+	
+	public void testSequencedRegex() {
+		String s=new String("adabdb");
+		Parser p=new Sequence(new Regex("a.a"),new Regex("b.b"));
+		assertEquals(1,p.parseCount(s));
+		assertEquals(6,p.parseFirst(s).length);
 	}
 	
 	
@@ -90,46 +134,11 @@ public class ParserTest extends TestCase {
 		assertNull(q.parse("ababababab",0));
 		}
 	
-	public void testWhiteSpace() {
-		Parser p=new Whitespace();
-		
-		assertTrue(p.parse("",0)==null);
-		assertTrue(p.parse(" ",0)!=null);
-		assertEquals(2,p.parseList("  ").count());
-		assertEquals(3,p.parseList(" \t ").count());
-		
-		assertTrue(p.parse("a a",0)==null);
-		assertTrue(p.parse("a a",1)!=null);
-	}
-	
-	public void testChoice() {
-		Parser p=new Choice(new Match("a"),new Match("b"));
-		
-		assertNotNull(p.parse("axxx"));
-		assertNotNull(p.parse("bxxx"));
-		assertNull(p.parse("cxxx"));
-	}
 
-	public void testDigit() {
-		Parser p=new Digit();
-		
-		assertNull(p.parse("",0));
-		assertNotNull(p.parse("1",0));
-		
-		Result r=p.parse("7");
-		
-		Integer i=(Integer)(r.object);
-		
-		assertEquals(i.intValue(),7);
-	}
 	
-	public void testEnd() {
-		Parser p=new End();
-		
-		assertNotNull(p.parse(""));
-		assertNotNull(p.parse("a",1));
-		assertNull(p.parse("a",0));
-	}
+
+
+
 	
 	
 	public void testSequence() {

@@ -1,5 +1,7 @@
 package mikera.parser;
 import java.util.*;
+import java.lang.ref.*;
+
 
 public final class Result implements ResultSource {
 	public Object object;
@@ -21,8 +23,11 @@ public final class Result implements ResultSource {
 	
 	public Result getNext() {
 		if (nextSource==null) return null;
+		
 		Result next=nextSource.nextResult();
-		if (next!=null) nextSource=next;
+		if (next!=null) {
+			nextSource=next;
+		}
 		return next;
 	}
 	

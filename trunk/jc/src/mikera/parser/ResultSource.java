@@ -1,5 +1,6 @@
 package mikera.parser;
 
-public interface ResultSource {
+
+interface ResultSource {
 	public Result nextResult();
 }
