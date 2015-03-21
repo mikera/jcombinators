@@ -25,7 +25,7 @@ public class Calculator {
 	public Parser integer=new Repeat(new Digit(),1,100) {
 		public void action(Result r) {
 			double v=0;
-			List<?> l=(List)(r.object);
+			List<?> l=(List<?>)(r.object);
 			for (int i=0; i<l.size(); i++) {
 				Result sr=r.getSubResult(i);
 				int d=((Integer)(sr.object)).intValue();
@@ -64,7 +64,7 @@ public class Calculator {
 	public Parser mulexp=new Sequence(value,new Repeat(new Sequence(maybespace,mulop,maybespace,value),1)) {
 		public void action(Result r) {
 			double d1=r.getSubResult(0).asDouble();
-			List dl=(List)r.getSubResult(1).object;
+			List<?> dl=(List<?>)r.getSubResult(1).object;
 			
 			for (Object or: dl) {
 				Result rr=(Result)or;
@@ -85,7 +85,7 @@ public class Calculator {
 	public Parser addexp=new Sequence(term,new Repeat(new Sequence(maybespace,addop,maybespace,term),1)) {
 		public void action(Result r) {
 			double d1=r.getSubResult(0).asDouble();
-			List dl=(List)r.getSubResult(1).object;
+			List<?> dl=(List<?>)r.getSubResult(1).object;
 			
 			for (Object or: dl) {
 				Result rr=(Result)or;

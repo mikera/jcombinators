@@ -1,6 +1,5 @@
 package mikera.parser;
 
-
 public final class ResultList implements ResultSource {
 	private Parser parser=null;
 	private Object data=null;

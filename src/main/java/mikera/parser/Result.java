@@ -41,7 +41,7 @@ public final class Result implements ResultSource {
 		if (!(object instanceof List)) {
 			throw new Error("Result object is not a List");
 		}
-		List l=(List)object;
+		List<?> l=(List<?>)object;
 		return (Result)l.get(i);
 	}
 	

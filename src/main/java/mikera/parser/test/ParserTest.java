@@ -154,7 +154,7 @@ public class ParserTest extends TestCase {
 		assertNotNull(r);
 
 		
-		ArrayList al=(ArrayList)r.object;
+		ArrayList<?> al=(ArrayList<?>)r.object;
 		Result r0=(Result)al.get(0);
 		assertEquals(r0.object,"a");
 	}
