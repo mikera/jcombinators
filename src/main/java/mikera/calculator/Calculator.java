@@ -2,7 +2,7 @@ package mikera.calculator;
 
 import mikera.parser.Parser;
 import mikera.parser.Result;
-import mikera.parser.primitives.*;
+import mikera.parser.engine.*;
 
 import java.util.*;
 
@@ -25,7 +25,7 @@ public class Calculator {
 	public Parser integer=new Repeat(new Digit(),1,100) {
 		public void action(Result r) {
 			double v=0;
-			List l=(List)(r.object);
+			List<?> l=(List)(r.object);
 			for (int i=0; i<l.size(); i++) {
 				Result sr=r.getSubResult(i);
 				int d=((Integer)(sr.object)).intValue();

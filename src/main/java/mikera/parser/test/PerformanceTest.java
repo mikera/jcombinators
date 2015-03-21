@@ -2,7 +2,7 @@ package mikera.parser.test;
 
 import mikera.parser.Parser;
 import mikera.parser.Result;
-import mikera.parser.primitives.*;
+import mikera.parser.engine.*;
 import junit.framework.TestCase;
 
 public class PerformanceTest extends TestCase {

@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import mikera.parser.Parser;
 import mikera.parser.Result;
 import mikera.parser.ResultList;
-import mikera.parser.primitives.*;
+import mikera.parser.engine.*;
 
 import java.util.*;
 

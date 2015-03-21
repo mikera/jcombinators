@@ -1,5 +1,5 @@
 package mikera.parser;
-import mikera.parser.primitives.*;
+import mikera.parser.engine.*;
 import java.util.*;
 
 public class Factory {
